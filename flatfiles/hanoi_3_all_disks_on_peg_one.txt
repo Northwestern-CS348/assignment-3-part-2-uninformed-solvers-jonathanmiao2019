@@ -16,3 +16,43 @@ fact: (pred obj1 obj2)
 rule: ((pred obj1 obj2) (pred obj2 obj3)) -> (pred obj1 obj3)
 
 """
+# Facts ON
+fact: (on disk1 peg1)
+fact: (on disk2 peg1)
+fact: (on disk3 peg1)
+
+# Facts Larger Than
+fact: (largerthan disk2 disk1)
+fact: (largerthan disk3 disk2)
+
+# Facts On Top
+fact: (ontop disk1 disk2)
+fact: (ontop disk2 disk3)
+
+# Facts Top
+fact: (top disk1 peg1)
+
+# Facts Movable
+fact: (movable disk1 peg1 peg2)
+fact: (movable disk1 peg1 peg3)
+
+# Fact peg empty
+fact: (isempty peg2)
+fact: (isempty peg3)
+
+# ============================ RULES ================================
+
+'''
+If disk A is on top of peg X and
+Peg Y is empty then
+Disk A is able to move onto peg Y
+'''
+rule: ((top ?a ?x) (isempty ?y)) -> (movable ?a ?x ?y)
+
+'''
+If disk A is on top of a stack and
+If disk B is also on top of a different stack and
+Disk B is larger than disk A then
+Disk A can be moved onto the peg that disk B is on
+'''
+rule: ((top ?a ?x) (top b? y?) (largernthan ?b ?a)) -> (movable ?a ?x ?y)

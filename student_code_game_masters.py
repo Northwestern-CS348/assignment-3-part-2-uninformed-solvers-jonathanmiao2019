@@ -33,7 +33,40 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        ### student code goes here
+        # ask what disks are on what peg in the KB
+        P1 = self.kb.kb_ask(parse_input('fact: (on ?disk peg1'))
+        P2 = self.kb.kb_ask(parse_input('fact: (on ?disk peg2'))
+        P3 = self.kb.kb_ask(parse_input('fact: (on ?disk peg3'))
+        p1 = []
+        p2 = []
+        p3 = []
+
+        # Disks on peg1
+        if P1:
+            for disks in P1:
+                # get the name and take the last index for the number
+                disk = int(str(disks.bindings[0].constant)[-1])
+                p1.append(disk)
+            p1.sort()
+
+        # Disks on peg2
+        if P2:
+            for disks in P2:
+                disk = int(str(disks.bindings[0].constant)[-1])
+                p2.append(disk)
+            p2.sort()
+
+        # Disks on peg3
+        if P3:
+            for disks in P3:
+                disk = int(str(disks.bindings[0].constant)[-1])
+                p3.append(disk)
+            p3.sort()
+
+        # Append the tuples together
+
+        game_state = (tuple(p1), tuple(p2), tuple(p3))
+        return game_state
         pass
 
     def makeMove(self, movable_statement):
