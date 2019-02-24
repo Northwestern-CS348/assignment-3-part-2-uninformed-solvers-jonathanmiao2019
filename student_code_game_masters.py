@@ -46,8 +46,11 @@ class TowerOfHanoiGame(GameMaster):
             for disks in P1:
                 # get the name and take the last index for the number
                 disk = int(str(disks.bindings[0].constant)[-1])
+                # append it to the array
                 p1.append(disk)
+            # sort array
             p1.sort()
+        # repeat for the next two pegs
 
         # Disks on peg2
         if P2:
@@ -85,7 +88,41 @@ class TowerOfHanoiGame(GameMaster):
         Returns:
             None
         """
-        ### Student code goes here
+        # Get the terms out of the statement
+        disk = str(movable_statement.terms[0])
+        init_peg = str(movable_statement.terms[1])
+        fin_peg = str(movable_statement.terms[2])
+
+        # Retract the facts from the KB
+        self.kb.kb_retract(parse_input("fact: (on " + disk + " " + init_peg + ")"))
+        self.kb.kb_retract(parse_input("fact: (top " + disk + " " + init_peg + ")"))
+
+        multiple = self.kb.kb_ask(parse_input("fact: (onTopOf " + disk + " ?d)"))
+        if multiple:
+            below_disk = str(multiple[0].bindings[0].constant)
+            self.kb.kb_retract(parse_input("fact: (onTopOf " + disk + " " + below_disk + ")"))
+            self.kb.kb_assert(parse_input("fact: (top " + below_disk + " " + init_peg + ")"))
+        else:
+            self.kb.kb_assert(parse_input("fact: (empty " + init_peg + ")"))
+
+        # We know for sure that the disk is on the fin_peg
+        self.kb.kb_assert(parse_input("fact: (on " + disk + " " + fin_peg + ")"))
+
+        # If fin peg was initially empty, it no longer is. Additionally, disk is for sure top of fin_peg
+        fin_empty = self.kb.kb_ask(parse_input("fact: (empty " + fin_peg + ")"))
+        if fin_empty:
+            self.kb.kb_retract(parse_input("fact: (empty " + fin_peg + ")"))
+        # if it's not empty, old "top" disk on fin_peg is no longer on top
+        else:
+            init_ontop = self.kb.kb_ask(parse_input("fact: (top ?disk " + fin_peg + ")"))
+            if init_ontop:
+                init_topdisk = init_ontop[0].bindings[0].constant
+                self.kb.kb_retract(parse_input("fact: (top " + str(init_topdisk) + " " + fin_peg + ")"))
+                self.kb.kb_assert(parse_input(("fact: (onTopOf " + disk + " " + str(init_topdisk) + ")")))
+
+        # Now assert that disk is on the top of fin_peg
+        self.kb.kb_assert(parse_input("fact: (top " + disk + " " + fin_peg + ")"))
+
         pass
 
     def reverseMove(self, movable_statement):
