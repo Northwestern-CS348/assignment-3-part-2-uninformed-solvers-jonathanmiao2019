@@ -34,9 +34,9 @@ class TowerOfHanoiGame(GameMaster):
             A Tuple of Tuples that represent the game state
         """
         # ask what disks are on what peg in the KB
-        P1 = self.kb.kb_ask(parse_input('fact: (on ?disk peg1'))
-        P2 = self.kb.kb_ask(parse_input('fact: (on ?disk peg2'))
-        P3 = self.kb.kb_ask(parse_input('fact: (on ?disk peg3'))
+        P1 = self.kb.kb_ask(parse_input('fact: (on ?disk peg1)'))
+        P2 = self.kb.kb_ask(parse_input('fact: (on ?disk peg2)'))
+        P3 = self.kb.kb_ask(parse_input('fact: (on ?disk peg3)'))
         p1 = []
         p2 = []
         p3 = []
@@ -169,7 +169,25 @@ class Puzzle8Game(GameMaster):
         Returns:
             A Tuple of Tuples that represent the game state
         """
-        ### Student code goes here
+
+        # Student code goes here
+        row1 = []
+        row2 = []
+        row3 = []
+        rows = [row1, row2, row3]
+
+        for ycoord in range(3):
+            for xcoord in range(3):
+                ask = parse_input("fact: (coordinate ?X pos" + str(xcoord + 1) + " pos" + str(ycoord + 1) + ")")
+                tile = str(self.kb.kb_ask(ask)[0])[-1]
+
+                # Check if no tile at location
+                if tile == 'y':
+                    tile = -1
+                rows[ycoord].append(int(tile))
+
+        game_state = (tuple(rows[0]), tuple(rows[1]), tuple(rows[2]))
+        return game_state
         pass
 
     def makeMove(self, movable_statement):
@@ -189,6 +207,20 @@ class Puzzle8Game(GameMaster):
             None
         """
         ### Student code goes here
+        tile = str(movable_statement.terms[0])
+        init_x = str(movable_statement.terms[1])
+        init_y = str(movable_statement.terms[2])
+        fin_x = str(movable_statement.terms[3])
+        fin_y = str(movable_statement.terms[4])
+
+        # Update initial location
+        self.kb.kb_retract(parse_input("fact: coordinate " + tile + " " + init_x + " " + init_y + ")"))
+        self.kb.kb_assert(parse_input("fact: coordinate empty " + init_x + " " + init_y + ")"))
+
+        # Update final location
+        self.kb.kb_retract(parse_input("fact: coordinate empty " + fin_x + " " + fin_y + ")"))
+        self.kb.kb_assert(parse_input("fact: coordinate " + tile + " " + fin_x + " " + fin_y + ")"))
+
         pass
 
     def reverseMove(self, movable_statement):
